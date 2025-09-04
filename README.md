@@ -31,7 +31,8 @@ This bot monitors the Ondo Global Markets smart contract (`0x2c158BC456e027b2AfF
     uint256 quantity,
     uint256 expiration,
     bytes32 additionalData
-  );```
+  );
+```
 
 ## Features
 
