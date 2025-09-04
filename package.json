@@ -1,7 +1,7 @@
 {
-  "name": "curio-sales-bot",
+  "name": "gm-bot",
   "version": "1.0.0",
-  "description": "Curio sales bot",
+  "description": "Ondo Global Market trades monitoring bot",
   "main": "index.js",
   "scripts": {
     "start": "node server.js",
@@ -9,15 +9,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/crypt0biwan/curio-sales-bot.git"
+    "url": "git+https://github.com/fafrd/gm-bot.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/crypt0biwan/curio-sales-bot/issues"
+    "url": "https://github.com/fafrd/gm-bot/issues"
   },
-  "homepage": "https://github.com/crypt0biwan/curio-sales-bot#readme",
+  "homepage": "https://github.com/fafrd/gm-bot#readme",
   "dependencies": {
     "axios": "^1.7.9",
     "discord.js": "^14.16.3",

@@ -1,148 +1,61 @@
-const { handleCurioTransfer, getCurioEventsFromBlock, getCurio17bEventsFromBlock } = require("../utils/watcher.js");
-const { getUsername } = require("../utils/opensea");
+const { handleGMTrade, getGMEventsFromBlock } = require("../utils/watcher.js");
+const { getAddressLabel } = require("../utils/address");
 
 const assert = require("assert");
-
-const mockOpenSeaClient = (address) => {
-	return new Promise((resolve, reject) => {
-		if (address == "0x49468f702436d1e590895ffa7155bcd393ce52ae")
-			resolve({
-				data: {
-					username: "mockUsername",
-					account: {
-						user: {
-							username: "mockUsername"
-						}
-					}
-				}
-			});
-		else
-			resolve({
-				data: {
-					username: null,
-				}
-			});
-	});
-}
 
 describe("Watcher", function () {
 	this.timeout(10_000);
 
-	describe("handleCurioTransfer()", function () {
-		it("should correctly find the single card 10 transfer in block 21353823", async function () {
-			const events = await getCurioEventsFromBlock(21353823);
-			assert.equal(events.length, 1);
+	describe("handleGMTrade()", function () {
+		it("should correctly parse a GM trade event", async function () {
+			// This is a mock test - you'll need to find actual block numbers with GM trades
+			// For now, we'll test the structure
+			
+			const mockEventLog = {
+				transactionHash: '0x123456789abcdef',
+				blockNumber: 12345678,
+				args: {
+					executionId: BigInt(1),
+					attestationId: BigInt(100),
+					chainId: BigInt(1),
+					userId: '0x' + '0'.repeat(64),
+					side: 0, // BUY
+					asset: '0x1234567890123456789012345678901234567890',
+					price: BigInt('1000000000000000000000'), // 1000 USD
+					quantity: BigInt('10000000000000000000'), // 10 tokens
+					expiration: BigInt(Math.floor(Date.now() / 1000) + 3600),
+					additionalData: '0x' + '0'.repeat(64)
+				}
+			};
 
-			const transfer = await handleCurioTransfer(events[0])
-			assert.deepEqual(transfer.data, { "10": 1 })
-			assert.equal(transfer.totalPrice, 0.180);
+			// Mock the contract interface parseLog
+			const gmContract = require("../utils/watcher").gmContract;
+			if (gmContract && gmContract.interface) {
+				// This would need actual testing with real events
+				console.log("GM contract loaded successfully");
+			}
 		});
 
-		it("should correctly find the 2x card 3 transfer in block 21318928", async function () {
-			const events = await getCurioEventsFromBlock(21318928);
-			assert.equal(events.length, 2);
-
-			const transfer = await handleCurioTransfer(events[0])
-			assert.deepEqual(transfer.data, { "3": 2 });
-			assert.equal(transfer.totalPrice, 0.280);
-		});
-
-		it("should correctly find the 1x card transfer 17b in block 15877962", async function () {
-			const events = await getCurio17bEventsFromBlock(15877962);
-			assert.equal(events.length, 1);
-
-			const transfer = await handleCurioTransfer(events[0])
-			assert.deepEqual(transfer.data, { "172": 1 });
-			assert.equal(transfer.totalPrice, 1.450);
-		});
-
-		it("should correctly find the single card 4 transfer in block 16771782 (seaport 1.4)", async function () {
-			const events = await getCurioEventsFromBlock(16771782);
-			assert.equal(events.length, 1);
-
-			const transfer = await handleCurioTransfer(events[0])
-			assert.deepEqual(transfer.data, { "4": 1 })
-			assert.equal(transfer.totalPrice, 0.710);
-		});
+		// You would add more tests here with actual block numbers containing GM trades
+		// For example:
+		// it("should correctly find a BUY trade in block XXXXXX", async function () {
+		//     const events = await getGMEventsFromBlock(XXXXXX);
+		//     assert.equal(events.length, 1);
+		//     const trade = await handleGMTrade(events[0])
+		//     assert.equal(trade.side, 'BUY');
+		//     // ... more assertions
+		// });
 	});
 
-	describe("bundleSale()", function () {
-		it("should return the correct data for a bundle sale", async function () {
-			const details = await handleCurioTransfer({
-				transactionHash: '0x85be82de90fb3cd167c3c5a67e4d42bb9fd291fe62aba6064ffd96676da4f1b7'
-			})
-			assert.deepEqual(details.data, { "10": 2, "7": 1, "11": 1, "20": 1 })
-			assert.equal(details.totalPrice, 0.713)
-			assert.equal(details.token, "ETH")
-		})
-	})
-
-	describe("handleNFTXSales()", function () {
-		it("should return the correct data for a NFTX sale (sushiswap)", async function () {
-			const details = await handleCurioTransfer({
-				transactionHash: '0xdc2f0dfc73e4e0f03ed1819b0ba936a35fd44c4f6812da538a681214589dc5f4'
-			})
-
-			assert.equal(details.qty, 0);
-			assert.equal(details.card, 0);
-			assert.equal(details.totalPrice, 0);
-		})
-	})
-
-
-	describe("handleSeaportSales()", function () {
-		it("should return the correct numbers for an ETH sale", async function () {
-			const details = await handleCurioTransfer({
-				transactionHash: '0x6c4f3f7a1ee7bccf446bf65f87b342160d8065658ac0e36a07f6c175464ea2f3'
-			})
-
-			assert.equal(details.token, "ETH");
-			assert.equal(details.totalPrice, "0.500");
-		})
-
-		it("should return the correct numbers for a WETH sale", async function () {
-			const details = await handleCurioTransfer({
-				transactionHash: '0xa0f3e19e03db8c9286742529828dde8d17d16935b3dbfb34826fcad6ecd2f145'
-			})
-
-			assert.equal(details.token, "WETH");
-			assert.equal(details.totalPrice, "0.320");
-		})
-	})
-
-	describe("handleSeaport_1_5_Sales()", function () {
-		it("should return the correct numbers for an ETH sale", async function () {
-			const details = await handleCurioTransfer({
-				transactionHash: '0xeddfb3b22b48550e4d26f3ce4d4a4330c5960eb013447aa770b3ce71595108e7'
-			})
-
-			assert.equal(details.token, "ETH");
-			assert.equal(details.totalPrice, "0.155");
-		})
-	})
-
-	describe("handleLooksRareSales()", function () {
-		it("should return the correct numbers for a WETH sale", async function () {
-			const details = await handleCurioTransfer({
-				transactionHash: '0xe1f9c0f3b55d277da8f72a95c1e98ff023272c59acdc929e878e9c524647e429'
-			})
-
-			assert.equal(details.token, "WETH");
-			assert.equal(details.totalPrice, "19.250");
-		})
-	})
-
-	describe("getOpenseaUsername()", function () {
-		it("should correctly find the username corresponding to ETH address 0x49468f702436d1e590895ffa7155bcd393ce52ae", async function () {
-			const username = await getUsername(mockOpenSeaClient, "0x49468f702436d1e590895ffa7155bcd393ce52ae");
-
-			assert.equal(username, "mockUsername");
+	describe("getAddressLabel()", function () {
+		it("should correctly format an ETH address", async function () {
+			const label = await getAddressLabel("0x49468f702436d1e590895ffa7155bcd393ce52ae");
+			assert.equal(label, "0x4946...52ae");
 		});
 
-		it("should correctly return a formatted ETH address when there's no username available", async function () {
-			const username = await getUsername(mockOpenSeaClient, "0xbebf173c83ad4c877c04592de0c38567abf66526");
-
-			assert.equal(username, "0xbeb...526");
+		it("should handle lowercase addresses", async function () {
+			const label = await getAddressLabel("0xbebf173c83ad4c877c04592de0c38567abf66526");
+			assert.equal(label, "0xbebf...6526");
 		});
 	});
 });

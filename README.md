@@ -1,33 +1,102 @@
-# curio-sales-bot
+# gm-bot
 
-# Setup
-Make sure you have the proper Node version installed (see `.nvmrc` file)
+Ondo Global Market trades monitoring bot for Discord and Twitter notifications.
 
-Copy `.env.sample` to `.env`.
+## Overview
 
-You'll need to get set up with an Infura account- log in to https://infura.io/ and create a new project. In `.env`, populate the INFURA_PROJECT_ID and INFURA_SECRET.
+This bot monitors the Ondo Global Market smart contract (`0x2c158BC456e027b2AfFCCadF1BDBD9f5fC4c5C8c`) for `TradeExecuted` events and posts real-time notifications to Discord and Twitter when trades occur.
 
-Next you'll need to set up a Discord webhook. In your server go to Settings -> Integrations and create a webhook. Set the DISCORD_ID to the first value and DISCORD_TOKEN to the second value.
+## Features
 
-For example... if your webhook URL is `https://discord.com/api/webhooks/1234123412341234/asdfasdfasdfasdfasdfasdfasdf`, set the .env file with
-`DISCORD_ID=1234123412341234`, `DISCORD_TOKEN=asdfasdfasdfasdfasdfasdfasdf`
+- Real-time monitoring of GM trades (BUY/SELL)
+- Discord webhook notifications with embedded trade details
+- Twitter notifications with trade summaries
+- Tracks USD price, quantity, and total value
+- Shows current ETH price for reference
+- Displays trader addresses (shortened format)
 
-Setting up the twitter part is a bit complicated. It was a pain to figure out how to get the API keys. Do the following steps:
-- Go to https://developer.twitter.com/en/portal/dashboard
-- you'll need to apply to become an api user, first. The application might take a few days.
-- when that's complete, create an app (NOT a 'standalone' app) here https://developer.twitter.com/en/portal/projects-and-apps
-- create a Production environment within the app. The name of this environment will be attached to each tweet, so make it good. Note the api key and secret.
-- settings -> set OAuth 1.0a and OAuth 2.0 turned on, MAKE SURE YOU ALLOW READ/WRITE PERMS
-- go back to Keys and Tokens, generate "Access Token and Secret", note the access token+token secret.
-- plop the details into your .env file
+## Setup
 
-# Running
-```
+### Prerequisites
+
+Make sure you have Node.js installed (check `.nvmrc` for version if available).
+
+### Configuration
+
+1. Copy `.env.sample` to `.env`
+2. Configure the following environment variables:
+
+#### Ethereum RPC
+- `RPC_URL`: Your Ethereum RPC endpoint (e.g., from Infura, Alchemy, or any provider)
+  - If not provided, falls back to a public endpoint
+
+#### Discord Webhook
+1. In your Discord server, go to Settings → Integrations
+2. Create a webhook
+3. Extract the ID and token from the webhook URL:
+   - URL format: `https://discord.com/api/webhooks/{DISCORD_ID}/{DISCORD_TOKEN}`
+   - Set `DISCORD_ID` and `DISCORD_TOKEN` in `.env`
+
+#### Twitter API
+1. Go to https://developer.twitter.com/en/portal/dashboard
+2. Apply for API access if needed (may take a few days)
+3. Create an app (not a standalone app)
+4. Create a Production environment (the name appears in tweets)
+5. In settings, enable OAuth 1.0a and OAuth 2.0 with READ/WRITE permissions
+6. Generate Access Token and Secret from Keys and Tokens
+7. Add to `.env`:
+   - `TWITTER_API_KEY`
+   - `TWITTER_API_KEY_SECRET`
+   - `TWITTER_ACCESS_TOKEN_KEY`
+   - `TWITTER_ACCESS_TOKEN_SECRET`
+
+## Running the Bot
+
+```bash
+npm install
 npm start
 ```
 
-# Testing
-Make sure you set the infura values in .env. The tests will contact the ethereum node.
-```
+The bot will start monitoring the GM contract and post notifications for every trade.
+
+## Testing
+
+```bash
 npm test
 ```
+
+Tests require RPC access to query blockchain data.
+
+## Trade Event Details
+
+The bot monitors `TradeExecuted` events with the following information:
+- **Execution ID**: Unique trade identifier
+- **Side**: BUY or SELL
+- **Asset**: Token address being traded
+- **Price**: USD price per token (18 decimals)
+- **Quantity**: Amount of tokens traded
+- **Total Value**: Price × Quantity in USD
+- **Trader**: Address executing the trade
+- **Timestamp**: When the trade occurred
+
+## Discord Notification Format
+
+- Color-coded embeds (green for BUY, red for SELL)
+- Shows asset symbol, quantity, price, and total value
+- Includes current ETH price for reference
+- Links to Etherscan transaction
+
+## Twitter Notification Format
+
+- Trade direction with emoji indicators
+- Formatted USD values
+- ETH equivalent for context
+- Transaction link
+
+## Architecture
+
+- `server.js`: Main entry point, sets up Discord and Twitter clients
+- `utils/watcher.js`: Monitors blockchain events
+- `utils/format.js`: Formats messages for Discord and Twitter
+- `utils/address.js`: Address formatting utilities
+- `abis/GlobalMarket.json`: Contract ABI for event decoding
