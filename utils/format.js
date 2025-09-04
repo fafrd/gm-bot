@@ -41,25 +41,33 @@ const formatDiscordMessage = async (trade) => {
     },
     {
       name: "Asset",
-      value: trade.assetSymbol,
+      value: `[${trade.assetSymbol}](https://etherscan.io/address/${trade.asset})`,
       inline: true,
     },
     {
       name: "Contract",
-      value: contractShort,
+      value: `[${contractShort}](https://etherscan.io/address/${trade.contract})`,
       inline: true,
     },
     {
       name: "Sender",
-      value: traderLabel,
+      value: `[${traderLabel}](https://etherscan.io/address/${trade.trader})`,
       inline: true,
     },
   ];
 
   const title = `${trade.assetSymbol} ${trade.side}`;
-  const description = `${action} **${formatValue(trade.quantity, 2)} ${
+  const description = `**${formatValue(trade.quantity, 2)} ${
     trade.assetSymbol
-  }** at **${formatValue(trade.price, 4, "currency")}** per token`;
+  }** at **${formatValue(
+    trade.price,
+    4,
+    "currency"
+  )}** per token for a total of **${formatValue(
+    trade.totalValue,
+    2,
+    "currency"
+  )}**`;
 
   // Transaction URL on Etherscan
   const url = `https://etherscan.io/tx/${trade.txHash}`;
@@ -70,8 +78,7 @@ const formatDiscordMessage = async (trade) => {
       {
         author: {
           name: "Ondo Global Markets",
-          icon_url:
-            "https://assets-global.website-files.com/62c6c96bb93c560764c906e5/62c6c96bb93c56d6a2c907fc_ondo-logotype-dark.svg",
+          icon_url: "https://ondo.finance/images/logo.png",
         },
         title: title,
         description: description,
