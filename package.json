@@ -1,7 +1,7 @@
 {
   "name": "gm-bot",
   "version": "1.0.0",
-  "description": "Ondo Global Market trades monitoring bot",
+  "description": "Ondo Global Markets trades monitoring bot",
   "main": "index.js",
   "scripts": {
     "start": "node server.js",

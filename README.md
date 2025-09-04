@@ -1,10 +1,37 @@
 # gm-bot
 
-Ondo Global Market trades monitoring bot for Discord and Twitter notifications.
+Ondo Global Markets trades monitoring bot for Discord and Twitter notifications.
 
 ## Overview
 
-This bot monitors the Ondo Global Market smart contract (`0x2c158BC456e027b2AfFCCadF1BDBD9f5fC4c5C8c`) for `TradeExecuted` events and posts real-time notifications to Discord and Twitter when trades occur.
+This bot monitors the Ondo Global Markets smart contract (`0x2c158BC456e027b2AfFCCadF1BDBD9f5fC4c5C8c`) for `TradeExecuted` events and posts real-time notifications to Discord and Twitter when trades occur.
+
+```solidity
+  /**
+   * @notice Event emitted when a trade is executed with an attestation
+   * @param  executionId    The monotonically increasing ID of the trade
+   * @param  attestationId  The ID of the quote
+   * @param  chainId        The chain ID the quote is intended to be used
+   * @param  userId         The user ID the quote is intended for
+   * @param  side           The direction of the quote (BUY or SELL)
+   * @param  asset          The address of the GM token being bought or sold
+   * @param  price          The price of the GM token in USD with 18 decimals
+   * @param  quantity       The quantity of GM tokens being bought or sold
+   * @param  expiration     The expiration of the quote in seconds since the epoch
+   * @param  additionalData Any additional data that is needed for the quote
+   */
+  event TradeExecuted(
+    uint256 executionId,
+    uint256 attestationId,
+    uint256 chainId,
+    bytes32 userId,
+    QuoteSide side,
+    address asset,
+    uint256 price,
+    uint256 quantity,
+    uint256 expiration,
+    bytes32 additionalData
+  );```
 
 ## Features
 

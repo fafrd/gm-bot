@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is an Ondo Global Market trades monitoring bot that tracks trades on Ethereum and posts notifications to Discord and Twitter. It monitors the GM contract for `TradeExecuted` events and reports trade activity in real-time.
+This is an Ondo Global Markets trades monitoring bot that tracks trades on Ethereum and posts notifications to Discord and Twitter. It monitors the GM contract for `TradeExecuted` events and reports trade activity in real-time.
 
 ## Key Commands
 
